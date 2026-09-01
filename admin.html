@@ -77,16 +77,28 @@
     <div class="panel" id="p-photos">
       <div class="panel-head">
         <h2>Photos</h2>
-        <p>Captions and which tournament each photo belongs to.</p>
+        <p>Drop new pictures here and the editor shrinks them for you. No software to install.</p>
       </div>
-      <div class="warn">
-        <strong>Adding a brand new photo takes two parts.</strong>
-        Part one is uploading the actual image file to GitHub, part two is adding a
-        row here. The <strong>Publish</strong> tab explains how to upload images.
-        Leave <strong>File name</strong> empty to show a grey "coming soon" tile.
+
+      <div class="dropzone" id="drop">
+        <div class="dz-icon">&#128247;</div>
+        <div class="dz-main">Drop photos here</div>
+        <div class="dz-sub">or <button class="mini" id="pick-btn">choose files</button> &nbsp;|&nbsp; JPG, PNG or HEIC</div>
+        <input type="file" id="file-in" accept="image/*" multiple hidden>
       </div>
+
+      <div id="shrink-out"></div>
+
+      <div class="warn" id="photo-help">
+        <strong>How adding a photo works.</strong>
+        Camera photos are far too big for a website, so they have to be shrunk
+        first. Drop them above and this page does that for you, then gives you the
+        files to upload. Full instructions appear once you drop something in.
+      </div>
+
+      <h3 style="margin:30px 0 12px">Photo list</h3>
       <div id="photo-rows"></div>
-      <div class="add-row"><button class="btn btn-primary" data-add="photo">+ Add a photo</button></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="photo">+ Add a photo row by hand</button></div>
     </div>
 
     <!-- ------------------------------------------------------ VIDEOS ---- -->
@@ -215,33 +227,43 @@
         Then tell Daniel. You cannot permanently break anything.
       </div>
 
-      <h3 style="margin:38px 0 12px">Uploading new photos</h3>
+      <h3 style="margin:38px 0 12px">Adding new photos</h3>
       <div class="bigstep" data-n="A">
-        <h3>Resize the pictures first</h3>
-        <p>Photos straight off a phone or camera are far too big and will make the
-           site painfully slow. They need to be shrunk first.</p>
-        <p>Easiest option: send the photos to Daniel and let him run the resizer.</p>
-        <p>Doing it yourself: put them in the <code>tools/incoming</code> folder and
-           run <code>python tools/add-photos.py</code>, which does everything and
-           prints the lines you need.</p>
+        <h3>Shrink them in the Photos tab</h3>
+        <p>Go to the <strong>Photos</strong> tab and drop your pictures into the
+           green box. The page shrinks them for you, right there in the browser.
+           Nothing to install.</p>
+        <p>For each photo pick its tournament, write a caption, then click
+           <strong>Download big version</strong> and <strong>Download thumbnail</strong>.
+           Both files have the same name, which is intentional.</p>
+        <p>Then click <strong>Add all of these to the photo list</strong>.</p>
       </div>
 
       <div class="bigstep" data-n="B">
-        <h3>Upload the two versions</h3>
-        <p>Each photo needs a large copy in <code>assets/img/photos</code> and a
-           small copy with the same file name in <code>assets/img/thumbs</code>.</p>
-        <p>On GitHub, open the folder, click <strong>Add file</strong>, then
-           <strong>Upload files</strong>, drag the pictures in, then
-           <strong>Commit changes</strong>. Repeat for the other folder.</p>
+        <h3>Upload the big versions</h3>
+        <p>On GitHub open <code>assets</code>, then <code>img</code>, then
+           <code>photos</code>.</p>
+        <p>Click <strong>Add file</strong>, then <strong>Upload files</strong>, and
+           drag in the files you downloaded with the <strong>big version</strong>
+           button. Then <strong>Commit changes</strong>.</p>
       </div>
 
       <div class="bigstep" data-n="C">
-        <h3>Add the row here</h3>
-        <p>Come back to the <strong>Photos</strong> tab in this editor, click
-           <strong>Add a photo</strong>, and type the file name <strong>without</strong>
-           the <code>.jpg</code> on the end.</p>
-        <p>So <code>state-final.jpg</code> is entered as just <code>state-final</code>.</p>
-        <p>Then publish again using steps 1 to 6 above.</p>
+        <h3>Upload the thumbnails</h3>
+        <p>Now open <code>assets</code>, then <code>img</code>, then
+           <code>thumbs</code>.</p>
+        <p>Upload the files from the <strong>thumbnail</strong> button the same way,
+           then <strong>Commit changes</strong>.</p>
+        <div class="tip">Both folders need a copy. The small one makes pages load
+          fast, the big one is what opens when someone clicks a photo. Miss one and
+          the picture will not show properly.</div>
+      </div>
+
+      <div class="bigstep" data-n="D">
+        <h3>Publish the text as well</h3>
+        <p>The pictures are uploaded, but the website does not know about them yet.
+           Go back to step 1 at the top of this page, download <code>data.js</code>
+           and upload it like normal.</p>
       </div>
 
       <h3 style="margin:38px 0 12px">The file, if you prefer copy and paste</h3>
