@@ -41,12 +41,8 @@
 
   <div class="adm-wrap">
 
-    <div class="warn" id="top-warn">
-      <strong>Nothing you do here goes live until you finish the Publish step.</strong>
-      Edit as much as you like, then open the green <strong>Publish</strong> tab at
-      the end and follow the six steps. Your changes are saved in this browser as
-      you type, so you will not lose them if you close the tab.
-    </div>
+    <div class="warn" id="origin-note" style="display:none"></div>
+    <div class="warn" id="status"></div>
 
     <!-- ------------------------------------------------------- CLUB ---- -->
     <div class="panel" id="p-club">
@@ -163,55 +159,60 @@
       </div>
 
       <div class="bigstep" data-n="1">
-        <h3>Copy the new file</h3>
-        <p>Click the button below. That copies the whole file to your clipboard.</p>
-        <p><button class="btn btn-primary" id="copy-btn">Copy the code</button></p>
-        <div class="tip">If the button does not work, click into the black box below,
-          press <kbd>Ctrl</kbd>+<kbd>A</kbd> then <kbd>Ctrl</kbd>+<kbd>C</kbd>.</div>
+        <h3>Download the new file</h3>
+        <p>Click the button. A file called <code>data.js</code> lands in your
+           Downloads folder.</p>
+        <p><button class="btn btn-primary" id="dl-btn">Download data.js</button></p>
+        <div class="tip">Downloading is far more reliable than copy and paste,
+          because there is no clipboard to get out of sync. Use this method.</div>
       </div>
 
       <div class="bigstep" data-n="2">
-        <h3>Open the file on GitHub</h3>
-        <p>Go to the club's repository on <strong>github.com</strong> and sign in.</p>
-        <p>Click the <code>assets</code> folder, then the <code>js</code> folder,
-           then click <code>data.js</code>.</p>
-        <div class="tip">Not signed in, or you do not see a pencil icon in step 3?
-          Then you do not have edit access yet. Ask Daniel to add you as a
-          collaborator on the repo.</div>
+        <h3>Open the right folder on GitHub</h3>
+        <p>Go to <code>github.com/whspingpong/whspingpong.github.io</code> and sign in.</p>
+        <p>Click the <code>assets</code> folder, then click the <code>js</code> folder.</p>
+        <p>You should see <code>admin.js</code>, <code>app.js</code> and
+           <code>data.js</code> listed.</p>
       </div>
 
       <div class="bigstep" data-n="3">
-        <h3>Start editing</h3>
-        <p>Near the top right of the file there is a row of small icons. Click the
-           <strong>pencil</strong> icon.</p>
-        <p>The file becomes an editable text box.</p>
+        <h3>Upload it</h3>
+        <p>Click the <strong>Add file</strong> button near the top right, then choose
+           <strong>Upload files</strong>.</p>
+        <p>Drag the <code>data.js</code> you just downloaded into the box, or click
+           <strong>choose your files</strong> and pick it from Downloads.</p>
+        <div class="tip">It replaces the old <code>data.js</code> automatically
+          because the name matches. That is exactly what you want.</div>
       </div>
 
       <div class="bigstep" data-n="4">
-        <h3>Replace everything</h3>
-        <p>Click anywhere inside the text box, then press
-           <kbd>Ctrl</kbd>+<kbd>A</kbd> to select the entire file.</p>
-        <p>Press <kbd>Delete</kbd>. The box should now be completely empty.</p>
-        <p>Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste in the new version.</p>
-        <div class="tip">On a Mac use <kbd>Cmd</kbd> instead of <kbd>Ctrl</kbd>.</div>
+        <h3>Save it</h3>
+        <p>Scroll down. Type a short note about what you changed, for example
+           <em>updated this week's training days</em>.</p>
+        <p>Click the green <strong>Commit changes</strong> button.</p>
       </div>
 
       <div class="bigstep" data-n="5">
-        <h3>Save it</h3>
-        <p>Click the green <strong>Commit changes...</strong> button at the top right.</p>
-        <p>A box pops up. Type a short note about what you changed, for example
-           <em>updated this week's training days</em>. Leave everything else alone.</p>
-        <p>Click the green <strong>Commit changes</strong> button in that box.</p>
+        <h3>Wait a minute</h3>
+        <p>GitHub needs about a minute to rebuild the site. Grab a drink.</p>
       </div>
 
       <div class="bigstep" data-n="6">
-        <h3>Check the site</h3>
-        <p>Wait about one minute, then open the website and press
-           <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> to force it to reload.</p>
-        <p>Your changes should be there.</p>
-        <div class="tip"><strong>Site looks broken or blank?</strong> Do not panic,
-          nothing is lost. Go back to the repo, click <strong>Commits</strong>,
-          find the commit before yours, and revert. Then tell Daniel.</div>
+        <h3>Check that it worked</h3>
+        <p>Click the button below. It reads the live website and tells you whether
+           your changes actually made it.</p>
+        <p><button class="btn btn-navy" id="sync-btn">Check the live website</button></p>
+        <div id="sync-out" style="margin-top:12px"></div>
+        <div class="tip">Then open the site and press
+          <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> to force your browser to load
+          the new version instead of the one it remembered.</div>
+      </div>
+
+      <h3 style="margin:38px 0 12px">If something goes wrong</h3>
+      <div class="warn red">
+        <strong>Site looks broken or blank?</strong> Nothing is lost. Go to the repo,
+        click <strong>Commits</strong>, find the commit before yours, and revert it.
+        Then tell Daniel. You cannot permanently break anything.
       </div>
 
       <h3 style="margin:38px 0 12px">Uploading new photos</h3>
@@ -243,7 +244,14 @@
         <p>Then publish again using steps 1 to 6 above.</p>
       </div>
 
-      <h3 style="margin:38px 0 12px">The file</h3>
+      <h3 style="margin:38px 0 12px">The file, if you prefer copy and paste</h3>
+      <p style="color:var(--ink-soft);font-size:.94rem;margin:0 0 12px">
+        Downloading is safer, but if you would rather paste by hand: open
+        <code>assets/js/data.js</code> on GitHub, click the pencil, press
+        <kbd>Ctrl</kbd>+<kbd>A</kbd> then <kbd>Delete</kbd>, then paste this in.
+      </p>
+      <p><button class="btn btn-navy" id="copy-btn">Copy the code</button>
+         <button class="mini danger" id="discard-btn" style="margin-left:10px">Throw away my changes</button></p>
       <div class="out" id="out"></div>
     </div>
 
