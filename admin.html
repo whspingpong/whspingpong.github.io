@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Officer Editor</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+<!-- ====================================================== PASSWORD GATE == -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <img src="assets/img/logo.png" alt="">
+    <h1>Officers only</h1>
+    <p>Enter the club password to open the editor.</p>
+    <input type="password" id="pw" placeholder="Password" autocomplete="off" inputmode="numeric">
+    <button class="btn btn-primary" id="pw-go">Unlock</button>
+    <div class="gate-err" id="pw-err"></div>
+  </div>
+</div>
+
+<!-- ============================================================== SHELL == -->
+<div id="app" style="display:none">
+
+  <div class="adm-bar">
+    <div class="inner">
+      <img src="assets/img/logo.png" alt="">
+      <div class="ttl">Officer Editor<small>Woodinville High School Ping Pong Club</small></div>
+      <a class="mini" href="index.html" style="text-decoration:none">View site</a>
+      <button class="mini" id="lock-btn">Lock</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="inner" id="tabbar"></div>
+  </div>
+
+  <div class="adm-wrap">
+
+    <div class="warn" id="top-warn">
+      <strong>Nothing you do here goes live until you finish the Publish step.</strong>
+      Edit as much as you like, then open the green <strong>Publish</strong> tab at
+      the end and follow the six steps. Your changes are saved in this browser as
+      you type, so you will not lose them if you close the tab.
+    </div>
+
+    <!-- ------------------------------------------------------- CLUB ---- -->
+    <div class="panel" id="p-club">
+      <div class="panel-head">
+        <h2>Club info</h2>
+        <p>The name, the intro text and the contact details that show in the header, the hero and the footer of every page.</p>
+      </div>
+      <div id="club-form"></div>
+    </div>
+
+    <!-- --------------------------------------------------- SCHEDULE ---- -->
+    <div class="panel" id="p-schedule">
+      <div class="panel-head">
+        <h2>Schedule</h2>
+        <p>Meetings, training days, tournaments and events. Untick <strong>Show on website</strong> to plan ahead without anyone seeing it. Days sort themselves by date.</p>
+      </div>
+      <div id="schedule-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="schedule">+ Add a day</button></div>
+    </div>
+
+    <!-- ------------------------------------------------ TOURNAMENTS ---- -->
+    <div class="panel" id="p-tourneys">
+      <div class="panel-head">
+        <h2>Tournaments</h2>
+        <p>Results shown on the Tournaments page. The two most recent ones also get the scrolling photo feeds on the home page.</p>
+      </div>
+      <div id="tourney-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="tourney">+ Add a tournament</button></div>
+    </div>
+
+    <!-- ------------------------------------------------------ PHOTOS ---- -->
+    <div class="panel" id="p-photos">
+      <div class="panel-head">
+        <h2>Photos</h2>
+        <p>Captions and which tournament each photo belongs to.</p>
+      </div>
+      <div class="warn">
+        <strong>Adding a brand new photo takes two parts.</strong>
+        Part one is uploading the actual image file to GitHub, part two is adding a
+        row here. The <strong>Publish</strong> tab explains how to upload images.
+        Leave <strong>File name</strong> empty to show a grey "coming soon" tile.
+      </div>
+      <div id="photo-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="photo">+ Add a photo</button></div>
+    </div>
+
+    <!-- ------------------------------------------------------ VIDEOS ---- -->
+    <div class="panel" id="p-videos">
+      <div class="panel-head">
+        <h2>Videos</h2>
+        <p>YouTube embeds. Paste only the ID, not the whole link. Leave it empty to show a "coming soon" box.</p>
+      </div>
+      <div class="warn">
+        In <code>https://www.youtube.com/watch?v=<strong>dQw4w9WgXcQ</strong></code>
+        the ID is the bold part after <code>v=</code>. The video must be set to
+        <strong>Public</strong> or <strong>Unlisted</strong> in YouTube Studio.
+        Private videos will not play.
+      </div>
+      <div id="video-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="video">+ Add a video</button></div>
+    </div>
+
+    <!-- ----------------------------------------------------- HISTORY ---- -->
+    <div class="panel" id="p-history">
+      <div class="panel-head">
+        <h2>History</h2>
+        <p>The timeline on the home page. Newest at the top. Tick <strong>Highlight</strong> for a solid green dot.</p>
+      </div>
+      <div id="history-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="history">+ Add a milestone</button></div>
+    </div>
+
+    <!-- ------------------------------------------------------- RULES ---- -->
+    <div class="panel" id="p-rules">
+      <div class="panel-head">
+        <h2>Rules and officers</h2>
+        <p>The numbered rules list, the paddle rental box, and who the officers are.</p>
+      </div>
+
+      <h3 style="margin:0 0 12px">Rules</h3>
+      <div id="rule-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="rule">+ Add a rule</button></div>
+
+      <h3 style="margin:34px 0 12px">Paddle rentals</h3>
+      <div id="paddle-form"></div>
+
+      <h3 style="margin:34px 0 12px">Officers</h3>
+      <div id="officer-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="officer">+ Add an officer</button></div>
+    </div>
+
+    <!-- -------------------------------------------------------- INFO ---- -->
+    <div class="panel" id="p-info">
+      <div class="panel-head">
+        <h2>Info sections</h2>
+        <p>The cards on the Rules and Info page. Each point is a short bold heading plus the detail. <strong>Keep the headings short</strong>, three or four words. That is what makes the page easy to read.</p>
+      </div>
+      <div id="info-rows"></div>
+      <div class="add-row"><button class="btn btn-primary" data-add="info">+ Add a section</button></div>
+    </div>
+
+    <!-- ----------------------------------------------------- PUBLISH ---- -->
+    <div class="panel" id="p-publish">
+      <div class="panel-head">
+        <h2>Publish your changes</h2>
+        <p>Follow these in order. It takes about two minutes. You cannot break anything permanently, every change can be undone.</p>
+      </div>
+
+      <div class="warn green">
+        <strong>What is actually happening here:</strong> the website reads all of
+        its text from a single file called <code>data.js</code>. This editor has
+        rewritten that file for you. All you are doing below is replacing the old
+        file with the new one.
+      </div>
+
+      <div class="bigstep" data-n="1">
+        <h3>Copy the new file</h3>
+        <p>Click the button below. That copies the whole file to your clipboard.</p>
+        <p><button class="btn btn-primary" id="copy-btn">Copy the code</button></p>
+        <div class="tip">If the button does not work, click into the black box below,
+          press <kbd>Ctrl</kbd>+<kbd>A</kbd> then <kbd>Ctrl</kbd>+<kbd>C</kbd>.</div>
+      </div>
+
+      <div class="bigstep" data-n="2">
+        <h3>Open the file on GitHub</h3>
+        <p>Go to the club's repository on <strong>github.com</strong> and sign in.</p>
+        <p>Click the <code>assets</code> folder, then the <code>js</code> folder,
+           then click <code>data.js</code>.</p>
+        <div class="tip">Not signed in, or you do not see a pencil icon in step 3?
+          Then you do not have edit access yet. Ask Daniel to add you as a
+          collaborator on the repo.</div>
+      </div>
+
+      <div class="bigstep" data-n="3">
+        <h3>Start editing</h3>
+        <p>Near the top right of the file there is a row of small icons. Click the
+           <strong>pencil</strong> icon.</p>
+        <p>The file becomes an editable text box.</p>
+      </div>
+
+      <div class="bigstep" data-n="4">
+        <h3>Replace everything</h3>
+        <p>Click anywhere inside the text box, then press
+           <kbd>Ctrl</kbd>+<kbd>A</kbd> to select the entire file.</p>
+        <p>Press <kbd>Delete</kbd>. The box should now be completely empty.</p>
+        <p>Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste in the new version.</p>
+        <div class="tip">On a Mac use <kbd>Cmd</kbd> instead of <kbd>Ctrl</kbd>.</div>
+      </div>
+
+      <div class="bigstep" data-n="5">
+        <h3>Save it</h3>
+        <p>Click the green <strong>Commit changes...</strong> button at the top right.</p>
+        <p>A box pops up. Type a short note about what you changed, for example
+           <em>updated this week's training days</em>. Leave everything else alone.</p>
+        <p>Click the green <strong>Commit changes</strong> button in that box.</p>
+      </div>
+
+      <div class="bigstep" data-n="6">
+        <h3>Check the site</h3>
+        <p>Wait about one minute, then open the website and press
+           <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> to force it to reload.</p>
+        <p>Your changes should be there.</p>
+        <div class="tip"><strong>Site looks broken or blank?</strong> Do not panic,
+          nothing is lost. Go back to the repo, click <strong>Commits</strong>,
+          find the commit before yours, and revert. Then tell Daniel.</div>
+      </div>
+
+      <h3 style="margin:38px 0 12px">Uploading new photos</h3>
+      <div class="bigstep" data-n="A">
+        <h3>Resize the pictures first</h3>
+        <p>Photos straight off a phone or camera are far too big and will make the
+           site painfully slow. They need to be shrunk first.</p>
+        <p>Easiest option: send the photos to Daniel and let him run the resizer.</p>
+        <p>Doing it yourself: put them in the <code>tools/incoming</code> folder and
+           run <code>python tools/add-photos.py</code>, which does everything and
+           prints the lines you need.</p>
+      </div>
+
+      <div class="bigstep" data-n="B">
+        <h3>Upload the two versions</h3>
+        <p>Each photo needs a large copy in <code>assets/img/photos</code> and a
+           small copy with the same file name in <code>assets/img/thumbs</code>.</p>
+        <p>On GitHub, open the folder, click <strong>Add file</strong>, then
+           <strong>Upload files</strong>, drag the pictures in, then
+           <strong>Commit changes</strong>. Repeat for the other folder.</p>
+      </div>
+
+      <div class="bigstep" data-n="C">
+        <h3>Add the row here</h3>
+        <p>Come back to the <strong>Photos</strong> tab in this editor, click
+           <strong>Add a photo</strong>, and type the file name <strong>without</strong>
+           the <code>.jpg</code> on the end.</p>
+        <p>So <code>state-final.jpg</code> is entered as just <code>state-final</code>.</p>
+        <p>Then publish again using steps 1 to 6 above.</p>
+      </div>
+
+      <h3 style="margin:38px 0 12px">The file</h3>
+      <div class="out" id="out"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>
