@@ -62,6 +62,7 @@
   /* --------------------------------------------------------------- state -- */
 
   var D = null;
+  var ORIGINAL = null;   /* what data.js held when this page loaded */
 
   function clone(x) { return JSON.parse(JSON.stringify(x)); }
 
@@ -84,6 +85,7 @@
   function save() {
     try { localStorage.setItem(LS_KEY, JSON.stringify(D)); } catch (e) {}
     build();
+    drawStatus();
   }
 
   function restore() {
@@ -577,6 +579,108 @@
     return s;
   }
 
+  /* ------------------------------------------------------ change tracking -- */
+
+  var SECTIONS = [
+    ["club", "Club info"], ["history", "History"], ["officers", "Officers"],
+    ["schedule", "Schedule"], ["scheduleNote", "Schedule note"],
+    ["tournaments", "Tournaments"], ["photos", "Photos"], ["videos", "Videos"],
+    ["rules", "Rules"], ["paddle", "Paddle rentals"], ["info", "Info sections"]
+  ];
+
+  function changedSections() {
+    if (!ORIGINAL) return [];
+    return SECTIONS.filter(function (s) {
+      return JSON.stringify(D[s[0]]) !== JSON.stringify(ORIGINAL[s[0]]);
+    }).map(function (s) {
+      var a = ORIGINAL[s[0]], b = D[s[0]], note = "";
+      if (Array.isArray(a) && Array.isArray(b)) {
+        var d = b.length - a.length;
+        if (d > 0) note = d + " added";
+        else if (d < 0) note = (-d) + " removed";
+        else note = "edited";
+      } else note = "edited";
+      return { name: s[1], note: note };
+    });
+  }
+
+  /* The status strip appears on every tab so it is impossible to miss. */
+  function drawStatus() {
+    var host = $("status");
+    if (!host) return;
+    var ch = changedSections();
+
+    if (!ch.length) {
+      host.className = "warn";
+      host.innerHTML = "<strong>No unsaved changes.</strong> " +
+        "What you see here matches the file the website is currently using.";
+      return;
+    }
+
+    host.className = "warn green";
+    host.innerHTML = "<strong>You have " + ch.length +
+      " unpublished change" + (ch.length === 1 ? "" : "s") + ":</strong> " +
+      ch.map(function (c) { return c.name + " (" + c.note + ")"; }).join(", ") +
+      ".<br>Nothing is live until you finish the <strong>Publish</strong> tab.";
+  }
+
+  /* -------------------------------------------------------------- download -- */
+
+  function downloadFile() {
+    var blob = new Blob([build()], { type: "text/javascript;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "data.js";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  /* --------------------------------------------------------- sync checking -- */
+
+  async function checkPublished() {
+    var box = $("sync-out");
+    box.innerHTML = '<div class="warn">Checking the live website...</div>';
+
+    try {
+      var res = await fetch("assets/js/data.js?cb=" + Date.now(), { cache: "no-store" });
+      var txt = await res.text();
+
+      var ctx = {};
+      new Function("with(this){" + txt + "; return {CLUB:CLUB,HISTORY:HISTORY," +
+        "OFFICERS:OFFICERS,SCHEDULE:SCHEDULE,SCHEDULE_NOTE:SCHEDULE_NOTE," +
+        "TOURNAMENTS:TOURNAMENTS,PHOTOS:PHOTOS,VIDEOS:VIDEOS,RULES:RULES," +
+        "PADDLE_RENTAL:PADDLE_RENTAL,INFO_SECTIONS:INFO_SECTIONS};}")
+        .call(ctx);
+
+      var pub = new Function(txt + "; return {club:CLUB,history:HISTORY," +
+        "officers:OFFICERS,schedule:SCHEDULE,scheduleNote:SCHEDULE_NOTE," +
+        "tournaments:TOURNAMENTS,photos:PHOTOS,videos:VIDEOS,rules:RULES," +
+        "paddle:PADDLE_RENTAL,info:INFO_SECTIONS};")();
+
+      var diff = SECTIONS.filter(function (s) {
+        return JSON.stringify(D[s[0]]) !== JSON.stringify(pub[s[0]]);
+      });
+
+      if (!diff.length) {
+        box.innerHTML = '<div class="warn green"><strong>You are in sync.</strong> ' +
+          "The published file matches what is in this editor. Your changes are live. " +
+          "Remember to hard refresh the site with Ctrl+Shift+R if you still see the old version.</div>";
+      } else {
+        box.innerHTML = '<div class="warn"><strong>Not published yet.</strong> ' +
+          "These sections are different from what the website is using: <strong>" +
+          diff.map(function (s) { return s[1]; }).join(", ") +
+          "</strong>.<br>Finish the steps above, then check again.</div>";
+      }
+    } catch (e) {
+      box.innerHTML = '<div class="warn red">Could not read the live file. ' +
+        "If you are opening this page straight from your hard drive, this check " +
+        "will not work. Open the published website instead.</div>";
+    }
+  }
+
   /* ---------------------------------------------------------------- copy -- */
 
   $("copy-btn").addEventListener("click", function () {
@@ -598,6 +702,15 @@
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(txt).then(done, fallback);
     } else fallback();
+  });
+
+  $("dl-btn").addEventListener("click", downloadFile);
+  $("sync-btn").addEventListener("click", checkPublished);
+
+  $("discard-btn").addEventListener("click", function () {
+    if (!confirm("Throw away every change you have made and go back to what the website is currently using?")) return;
+    try { localStorage.removeItem(LS_KEY); } catch (e) {}
+    location.reload();
   });
 
   /* ---------------------------------------------------------------- tabs -- */
@@ -622,7 +735,6 @@
       document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("on"); });
       b.classList.add("on");
       $("p-" + b.dataset.tab).classList.add("on");
-      $("top-warn").style.display = (b.dataset.tab === "publish") ? "none" : "";
       window.scrollTo({ top: 0 });
     });
 
@@ -636,9 +748,31 @@
   function boot() {
     if (booted) return;
     booted = true;
+    ORIGINAL = loadFromSite();
     D = restore();
     setupTabs();
     drawAll();
+    drawStatus();
+    showOriginNote();
+  }
+
+  /* Warn when the editor is running somewhere other than the published site,
+     because drafts are stored per website and do not carry across. */
+  function showOriginNote() {
+    var note = $("origin-note");
+    if (!note) return;
+    var host = location.hostname;
+    if (host === "localhost" || host === "127.0.0.1" || location.protocol === "file:") {
+      note.className = "warn red";
+      note.innerHTML = "<strong>You are using a local test copy, not the real website.</strong> " +
+        "Changes you make here are stored only in this browser on this address, and they " +
+        "will not appear in an editor opened on the live site. " +
+        "To avoid confusion, do your editing at " +
+        "<strong>https://whspingpong.github.io/admin.html</strong> instead.";
+      note.style.display = "";
+    } else {
+      note.style.display = "none";
+    }
   }
 
   try {
