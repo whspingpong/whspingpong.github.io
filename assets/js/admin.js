@@ -339,6 +339,14 @@
     var t = e.target, p = t.dataset.p;
     if (!p) return;
     var v = (t.type === "checkbox") ? t.checked : t.value;
+
+    /* fields belonging to freshly shrunk photos, not the saved data */
+    if (p.indexOf("SHOT.") === 0) {
+      var bits = p.split(".");
+      if (shrunk[bits[1]]) shrunk[bits[1]][bits[2]] = v;
+      return;
+    }
+
     if (p.endsWith(".rank") || p === "club.founded") {
       var n = parseInt(v, 10);
       v = isNaN(n) ? 0 : n;
@@ -351,6 +359,51 @@
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;
+
+    /* ---- shrunk photo buttons ---- */
+    if (b.dataset.dlfull !== undefined) {
+      var sf = shrunk[b.dataset.dlfull];
+      saveBlob(sf.full.blob, sf.slug + ".jpg");
+      b.classList.add("copied"); b.textContent = "1. Downloaded";
+      return;
+    }
+    if (b.dataset.dlthumb !== undefined) {
+      var st = shrunk[b.dataset.dlthumb];
+      saveBlob(st.thumb.blob, st.slug + ".jpg");
+      b.classList.add("copied"); b.textContent = "2. Downloaded";
+      return;
+    }
+    if (b.dataset.dropshot !== undefined) {
+      shrunk.splice(+b.dataset.dropshot, 1);
+      drawShrunk();
+      return;
+    }
+    if (b.id === "addall-btn") {
+      var n = 0;
+      shrunk.forEach(function (s) {
+        if (s.added) return;
+        D.photos.push({
+          file: s.slug,
+          tournament: s.tournament || ((D.tournaments[0] || {}).id || ""),
+          featured: false,
+          caption: s.caption || s.slug.replace(/-/g, " ")
+        });
+        s.added = true; n++;
+      });
+      save(); drawAll(); drawShrunk();
+      if (n) {
+        alert(n + " photo" + (n === 1 ? "" : "s") + " added to the list below.\n\n" +
+              "You still need to download both files for each one and upload them to " +
+              "GitHub, otherwise the pictures will not appear.");
+      }
+      return;
+    }
+    if (b.id === "clearshots-btn") {
+      if (confirm("Clear these shrunk photos? Any you have not downloaded will be lost.")) {
+        shrunk = []; drawShrunk();
+      }
+      return;
+    }
 
     var add = b.dataset.add;
     var del = b.dataset.del, up = b.dataset.up, dn = b.dataset.down;
@@ -680,6 +733,168 @@
         "will not work. Open the published website instead.</div>";
     }
   }
+
+  /* ------------------------------------------------------ photo shrinking --
+     Resizes dropped photos entirely inside the browser using a canvas, so
+     officers do not need Python or any software installed.
+     Produces the same two sizes the Python script makes:
+       full  1600px wide, quality 82
+       thumb  700px wide, quality 78
+     ---------------------------------------------------------------------- */
+
+  var FULL_W = 1600, FULL_Q = 0.82;
+  var THUMB_W = 700, THUMB_Q = 0.78;
+
+  function slugify(name) {
+    return (name.replace(/\.[^.]+$/, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")) || "photo";
+  }
+
+  function uniqueSlug(base) {
+    var taken = {};
+    D.photos.forEach(function (p) { if (p.file) taken[p.file] = 1; });
+    shrunk.forEach(function (s) { taken[s.slug] = 1; });
+    if (!taken[base]) return base;
+    var n = 2;
+    while (taken[base + "-" + n]) n++;
+    return base + "-" + n;
+  }
+
+  function readImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("unreadable")); };
+      img.src = url;
+    });
+  }
+
+  function scaleTo(img, maxW, quality) {
+    var w = img.naturalWidth, h = img.naturalHeight;
+    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+    var c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    var x = c.getContext("2d");
+    x.imageSmoothingEnabled = true;
+    x.imageSmoothingQuality = "high";
+    x.drawImage(img, 0, 0, w, h);
+    return new Promise(function (resolve) {
+      c.toBlob(function (b) { resolve({ blob: b, w: w, h: h }); }, "image/jpeg", quality);
+    });
+  }
+
+  var shrunk = [];
+
+  function kb(n) { return Math.round(n / 1024) + " KB"; }
+
+  function saveBlob(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  async function handleFiles(list) {
+    var files = Array.prototype.slice.call(list).filter(function (f) {
+      return /^image\//.test(f.type) || /\.(jpe?g|png|heic|heif|webp|bmp)$/i.test(f.name);
+    });
+    if (!files.length) {
+      alert("Those do not look like photos. Use JPG, PNG or HEIC files.");
+      return;
+    }
+
+    var out = $("shrink-out");
+    out.innerHTML = '<div class="busy">Shrinking ' + files.length + " photo" +
+      (files.length === 1 ? "" : "s") + ", give it a second...</div>";
+
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      try {
+        var img = await readImage(f);
+        var full = await scaleTo(img, FULL_W, FULL_Q);
+        var thumb = await scaleTo(img, THUMB_W, THUMB_Q);
+        var slug = uniqueSlug(slugify(f.name));
+
+        shrunk.push({
+          slug: slug, origName: f.name, origSize: f.size,
+          full: full, thumb: thumb,
+          preview: URL.createObjectURL(thumb.blob),
+          tournament: (D.tournaments[0] || {}).id || "",
+          caption: ""
+        });
+      } catch (e) {
+        console.warn("skipped", f.name, e);
+      }
+    }
+    drawShrunk();
+  }
+
+  function drawShrunk() {
+    var out = $("shrink-out");
+    if (!shrunk.length) { out.innerHTML = ""; return; }
+
+    var opts = tourneyOpts();
+
+    out.innerHTML =
+      '<div class="warn green"><strong>Done. ' + shrunk.length + " photo" +
+      (shrunk.length === 1 ? " is" : "s are") + " ready.</strong> " +
+      "Now do three things for each one: pick its tournament, write a caption, " +
+      "then click both download buttons. After that jump to the " +
+      "<strong>Publish</strong> tab, where step A explains where the two files go." +
+      "</div>" +
+      shrunk.map(function (s, i) {
+        return '<div class="shot">' +
+          '<img src="' + s.preview + '" alt="">' +
+          "<div>" +
+            '<div class="shot-name">' + esc(s.slug) + ".jpg" +
+              (s.added ? '<span class="done-badge">added to list</span>' : "") + "</div>" +
+            '<div class="shot-meta">' + esc(s.origName) + " &middot; was <b>" + kb(s.origSize) +
+              "</b>, now <b>" + kb(s.full.blob.size) + "</b> + " + kb(s.thumb.blob.size) +
+              " thumbnail</div>" +
+            '<div class="grid two">' +
+              pick("Tournament", "SHOT." + i + ".tournament", s.tournament, opts) +
+              field("Caption", "SHOT." + i + ".caption", s.caption, "shows under the photo") +
+            "</div>" +
+            '<div class="shot-dl">' +
+              '<button class="btn btn-primary" data-dlfull="' + i + '">1. Download big version</button>' +
+              '<button class="btn btn-navy" data-dlthumb="' + i + '">2. Download thumbnail</button>' +
+              '<button class="mini danger" data-dropshot="' + i + '">Remove</button>' +
+            "</div>" +
+          "</div></div>";
+      }).join("") +
+      '<div class="add-row" style="margin-top:16px">' +
+        '<button class="btn btn-primary" id="addall-btn">Add all of these to the photo list</button> ' +
+        '<button class="mini" id="clearshots-btn" style="margin-left:8px">Clear</button>' +
+      "</div>";
+  }
+
+  /* dropzone wiring */
+  (function () {
+    var dz = $("drop"), inp = $("file-in");
+    if (!dz) return;
+
+    dz.addEventListener("click", function (e) {
+      if (e.target.id !== "pick-btn") inp.click();
+    });
+    $("pick-btn").addEventListener("click", function (e) { e.stopPropagation(); inp.click(); });
+    inp.addEventListener("change", function () { handleFiles(this.files); this.value = ""; });
+
+    ["dragenter", "dragover"].forEach(function (ev) {
+      dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add("over"); });
+    });
+    ["dragleave", "drop"].forEach(function (ev) {
+      dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove("over"); });
+    });
+    dz.addEventListener("drop", function (e) {
+      if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+    });
+
+    /* stop the browser opening an image if it misses the box */
+    window.addEventListener("dragover", function (e) { e.preventDefault(); });
+    window.addEventListener("drop", function (e) { e.preventDefault(); });
+  })();
 
   /* ---------------------------------------------------------------- copy -- */
 
