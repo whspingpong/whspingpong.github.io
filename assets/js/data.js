@@ -3,7 +3,7 @@
    =========================================================================
 
    This file was written by the officer editor at admin.html
-   Last updated: 9/1/2026, 1:25:35 PM
+   Last updated: 9/1/2026, 1:50:19 PM
 
    You can edit it by hand, but the editor is safer because it cannot
    produce a typo that breaks the site.
@@ -110,7 +110,7 @@ const SCHEDULE = [
     title:   "Club Meeting",
     time:    "After school",
     place:   "E Building",
-    visible: false,
+    visible: true,
     note:    "Open play, first to 5 rotation on every table."
   },
   {
