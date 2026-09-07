@@ -67,18 +67,33 @@ paste new entries anywhere in the list.
 
 ## The easy way: the Officer Editor
 
-Open **`admin.html`** (there is a faint **Officer login** link at the very bottom
-of every page, or go to `yoursite.com/admin.html` directly).
+Open **https://whspingpong.github.io/admin.html** (there is a faint **Officer
+login** link at the very bottom of every page).
 
 Password: **`683293`**
 
-It has a tab for everything: club info, schedule, tournaments, photos, videos,
-history, rules, officers and info sections. You fill in boxes, it writes the code
-for you, and the **Publish** tab walks you through getting it onto GitHub in six
-numbered steps.
+> **Always use the live URL above, not a local copy.** The editor saves your work
+> in the browser, and browser storage does not travel between web addresses. If
+> you edit on `localhost` and then publish from the live page, you will publish
+> the wrong thing. The editor shows a red warning when you are on a local copy.
 
-Your work is saved in your browser as you type, so closing the tab will not lose
-anything.
+It has a tab for everything: club info, schedule, tournaments, photos, videos,
+history, rules, officers and info sections. A strip at the top always tells you
+whether you have unpublished changes.
+
+### Publishing
+
+The **Publish** tab walks through it in six steps. The short version:
+
+1. Click **Download data.js**
+2. On GitHub go to `assets` then `js`
+3. **Add file** then **Upload files**, drag the downloaded `data.js` in
+4. **Commit changes**
+5. Wait a minute
+6. Click **Check the live website** in the editor to confirm it worked
+
+Uploading a file with the same name replaces the old one. That is intentional and
+is much harder to get wrong than copying and pasting code.
 
 ### About that password
 
@@ -87,8 +102,8 @@ real security, because anyone who knows how to read a page's source can get past
 it. That is unavoidable on a site with no server.
 
 **The thing that actually protects the site is GitHub.** The editor only produces
-text. Nothing goes live until someone with repo access commits it. So a stranger
-getting the password still cannot change the website.
+a file. Nothing goes live until someone with repo access commits it. So a
+stranger getting the password still cannot change the website.
 
 To change it later, generate a new SHA-256 hash of the password you want and
 replace the `PASSWORD_HASH` line near the top of `assets/js/admin.js`:
@@ -139,19 +154,21 @@ on the home page. Nothing to configure.
 
 ### Add photos
 
-```
-1. Copy your photos into  tools/incoming/
-2. Run:  python tools/add-photos.py
-3. Paste the printed lines into the PHOTOS list in data.js
-4. Fix the tournament id and write a real caption
-```
+Do it in the editor, no software needed:
 
-The script shrinks 8 MB camera files to around 200 KB and makes both the
-full size and thumbnail versions. **Do not skip it.** Full size photos will make
-the site painfully slow.
+1. **Photos** tab, drop your pictures into the green box
+2. The browser shrinks each one and shows you the before and after size
+3. Pick a tournament and write a caption for each
+4. Click **Download big version** and **Download thumbnail**
+5. Click **Add all of these to the photo list**
+6. Upload the big files to `assets/img/photos` and the thumbnails to
+   `assets/img/thumbs` on GitHub, then publish `data.js` as normal
 
-Lines with `file: null` are grey "coming soon" tiles. Delete them as real photos
-come in.
+Both files for a photo share the same name. That is intentional, one folder holds
+the large copy and the other holds the small one.
+
+There is also a Python version at `tools/add-photos.py` if you prefer working from
+a terminal, but the browser method does the same job and needs nothing installed.
 
 ### Add a video
 Upload in YouTube Studio, then copy the ID out of the URL:
