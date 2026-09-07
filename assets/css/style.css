@@ -356,6 +356,9 @@ a { color: var(--kelly-700); }
 .is-placeholder .ph-icon { font-size: 1.7rem; opacity: .5; }
 .is-placeholder .ph-text { font-size: .8rem; font-weight: 600; }
 
+.ph-fill { width: 100%; height: 100%; border-radius: inherit; }
+.has-missing { cursor: default; }
+
 /* --------------------------------------------------------------- filter -- */
 
 .filters { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 26px; }

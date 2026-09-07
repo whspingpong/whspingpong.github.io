@@ -239,8 +239,15 @@
     const p = lbList[lbIndex];
     if (!p) return;
     const t = tById(p.tournament);
-    el("lb-img").src = fullSrc(p);
-    el("lb-img").alt = p.caption || "";
+    const img = el("lb-img");
+    img.onerror = function () {
+      img.onerror = null;
+      img.removeAttribute("src");
+      el("lb-cap").innerHTML =
+        "This photo has not been uploaded yet.";
+    };
+    img.src = fullSrc(p);
+    img.alt = p.caption || "";
     el("lb-cap").innerHTML = esc(p.caption || "") +
       (t ? ` <span style="opacity:.65">${esc(t.short)}</span>` : "");
   }
@@ -275,6 +282,32 @@
               <img src="${esc(thumbSrc(p))}" alt="${esc(p.caption || "")}" loading="lazy">
               ${tag}<span class="photo-cap">${esc(p.caption || "")}</span>
             </button>`;
+  }
+
+  /* If an image file has not been uploaded yet, show the normal "coming soon"
+     tile instead of a broken image icon. Errors do not bubble, so listen in the
+     capture phase. Only the <img> is swapped, so medal badges and tournament
+     tags on the same card survive. */
+  function watchMissingImages(root) {
+    root.addEventListener("error", (e) => {
+      const img = e.target;
+      if (!img || img.tagName !== "IMG") return;
+
+      const card = img.closest(".photo-card, .feed-item, .tourney-cover");
+      if (!card || card.dataset.missing) return;
+      card.dataset.missing = "1";
+      card.removeAttribute("data-file");
+      card.classList.add("has-missing");
+
+      const ph = document.createElement("div");
+      ph.className = "is-placeholder ph-fill";
+      ph.innerHTML = '<span class="ph-icon">&#128247;</span>' +
+                     '<span class="ph-text">Photo coming soon</span>';
+      img.replaceWith(ph);
+
+      const cap = card.querySelector(".photo-cap");
+      if (cap) cap.remove();
+    }, true);
   }
 
   function connectCardsHtml() {
@@ -380,6 +413,7 @@
       }).join("");
 
       const all = PHOTOS.filter((p) => p.file);
+      watchMissingImages(feeds);
       feeds.addEventListener("click", (e) => {
         const c = e.target.closest("[data-file]");
         if (!c) return;
@@ -489,6 +523,8 @@
           </div>
         </article>`;
     }).join("");
+
+    watchMissingImages(host);
   }
 
   /* -------------------------------------------------------------- GALLERY -- */
@@ -533,6 +569,7 @@
       if (i > -1) openLb(list, i);
     });
 
+    watchMissingImages(grid);
     draw();
   }
 

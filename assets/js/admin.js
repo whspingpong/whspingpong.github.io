@@ -691,6 +691,72 @@
     setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
   }
 
+  /* ------------------------------------------------- missing image check --
+     The most common mistake is adding photo rows but never uploading the
+     actual image files. This checks every listed photo against the server. */
+
+  async function fileExists(url) {
+    try {
+      var r = await fetch(url + "?cb=" + Date.now(), { method: "HEAD", cache: "no-store" });
+      return r.ok;
+    } catch (e) { return false; }
+  }
+
+  async function checkPhotoFiles(box) {
+    var listed = D.photos.filter(function (p) { return p.file; });
+    if (!listed.length) { box.innerHTML = ""; return []; }
+
+    box.innerHTML = '<div class="warn">Checking ' + listed.length +
+      " photo file" + (listed.length === 1 ? "" : "s") + " on the server...</div>";
+
+    var missing = [];
+    for (var i = 0; i < listed.length; i++) {
+      var p = listed[i];
+      var big = await fileExists("assets/img/photos/" + p.file + ".jpg");
+      var small = await fileExists("assets/img/thumbs/" + p.file + ".jpg");
+      if (!big || !small) {
+        missing.push({ file: p.file, big: big, small: small });
+      }
+    }
+
+    if (!missing.length) {
+      box.innerHTML = '<div class="warn green"><strong>All photo files are uploaded.</strong> ' +
+        "Every photo in the list below has both of its image files on the server.</div>";
+      return [];
+    }
+
+    box.innerHTML = '<div class="warn red"><strong>' + missing.length +
+      " photo" + (missing.length === 1 ? " is" : "s are") + " missing image files.</strong> " +
+      "These are listed in the data but the actual pictures were never uploaded, " +
+      "so they show as empty tiles on the website.<br><br>" +
+      missing.slice(0, 40).map(function (m) {
+        var need = [];
+        if (!m.big) need.push("assets/img/photos");
+        if (!m.small) need.push("assets/img/thumbs");
+        return "&bull; <code>" + esc(m.file) + ".jpg</code> needs uploading to " + need.join(" and ");
+      }).join("<br>") +
+      (missing.length > 40 ? "<br>&bull; and " + (missing.length - 40) + " more" : "") +
+      '<br><br><button class="mini" id="fixmissing-btn">Remove these from the list</button> ' +
+      "<span style=\"font-size:.88rem\">or upload the pictures, then publish again.</span></div>";
+
+    var btn = $("fixmissing-btn");
+    if (btn) {
+      btn.addEventListener("click", function () {
+        if (!confirm("Remove " + missing.length + " photo row" +
+            (missing.length === 1 ? "" : "s") + " that have no image file?\n\n" +
+            "The pictures themselves are not deleted. You can add the rows back " +
+            "after uploading the images.")) return;
+        var gone = {};
+        missing.forEach(function (m) { gone[m.file] = 1; });
+        D.photos = D.photos.filter(function (p) { return !p.file || !gone[p.file]; });
+        save(); drawAll();
+        box.innerHTML = '<div class="warn green"><strong>Removed.</strong> ' +
+          "Now publish so the website matches.</div>";
+      });
+    }
+    return missing;
+  }
+
   /* --------------------------------------------------------- sync checking -- */
 
   async function checkPublished() {
@@ -727,6 +793,12 @@
           diff.map(function (s) { return s[1]; }).join(", ") +
           "</strong>.<br>Finish the steps above, then check again.</div>";
       }
+
+      /* text can be published and still look broken if the pictures are absent */
+      var extra = document.createElement("div");
+      extra.style.marginTop = "12px";
+      box.appendChild(extra);
+      await checkPhotoFiles(extra);
     } catch (e) {
       box.innerHTML = '<div class="warn red">Could not read the live file. ' +
         "If you are opening this page straight from your hard drive, this check " +
@@ -951,6 +1023,8 @@
       b.classList.add("on");
       $("p-" + b.dataset.tab).classList.add("on");
       window.scrollTo({ top: 0 });
+
+      if (b.dataset.tab === "photos") checkPhotoFiles($("photo-check"));
     });
 
     $("p-club").classList.add("on");
