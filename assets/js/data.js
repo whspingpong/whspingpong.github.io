@@ -3,7 +3,7 @@
    =========================================================================
 
    This file was written by the officer editor at admin.html
-   Last updated: 9/1/2026, 1:54:10 PM
+   Last updated: 9/6/2026, 9:16:32 PM
 
    You can edit it by hand, but the editor is safer because it cannot
    produce a typo that breaks the site.
@@ -163,6 +163,36 @@ const TOURNAMENTS = [
 
     about:       "Washington's official high school table tennis team championship, where schools from across the state field their top eight players in a team format. Finishing in the top two qualifies a team for the AYTTO National High School Championships.",
     performance: "State champions. We went undefeated through the entire bracket, took the title, and punched our ticket to nationals."
+  },
+  {
+    id:        "state-2025",
+    name:      "2025 Washington High School Table Tennis Team Championships",
+    short:     "State 2025",
+    level:     "State",
+    date:      "2025-04-19",
+    time:      "All day",
+    venue:     "Hazen High School",
+    location:  "Renton, Washington",
+    placement: "3rd Place",
+    rank:      3,
+
+    about:       "Washington's official high school table tennis team championship, where schools from across the state field their top eight players in a team format. Finishing in the top two qualifies a team for the AYTTO National High School Championships.",
+    performance: "3rd Place. We fought hard until the semifinals, where we lost to Henry Jackson High School."
+  },
+  {
+    id:        "state-2024",
+    name:      "2024 Washington High School Table Tennis Team Championships",
+    short:     "State 2024",
+    level:     "State",
+    date:      "2024-04-22",
+    time:      "All day",
+    venue:     "Tacoma Table Tennis Club",
+    location:  "Tacome, Washington",
+    placement: "3rd Place",
+    rank:      3,
+
+    about:       "Washington's official high school table tennis team championship, where schools from across the state field their top eight players in a team format.",
+    performance: "3rd place. A good finish for our first year in competition."
   }
 ];
 
