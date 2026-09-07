@@ -4,6 +4,7 @@
 
    This file was written by the officer editor at admin.html
    Last updated: 9/6/2026, 10:34:32 PM
+   State 2026 photo list updated manually on 9/6/2026
 
    You can edit it by hand, but the editor is safer because it cannot
    produce a typo that breaks the site.
@@ -210,7 +211,59 @@ const PHOTOS = [
   { file: "state-2026-113", tournament: "state-2026", featured: true,
     caption: "Mid rally at the State Championships" },
   { file: "state-2026-125", tournament: "state-2026", featured: true,
-    caption: "State Championships at Hazen High School" }
+    caption: "State Championships at Hazen High School" },
+  { file: "2026pingpongstatechampionships-014", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 014" },
+  { file: "2026pingpongstatechampionships-034", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 034" },
+  { file: "2026pingpongstatechampionships-035", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 035" },
+  { file: "2026pingpongstatechampionships-036", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 036" },
+  { file: "2026pingpongstatechampionships-037", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 037" },
+  { file: "2026pingpongstatechampionships-041", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 041" },
+  { file: "2026pingpongstatechampionships-044", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 044" },
+  { file: "2026pingpongstatechampionships-045", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 045" },
+  { file: "2026pingpongstatechampionships-046", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 046" },
+  { file: "2026pingpongstatechampionships-047", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 047" },
+  { file: "2026pingpongstatechampionships-048", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 048" },
+  { file: "2026pingpongstatechampionships-049", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 049" },
+  { file: "2026pingpongstatechampionships-050", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 050" },
+  { file: "2026pingpongstatechampionships-051", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 051" },
+  { file: "2026pingpongstatechampionships-076", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 076" },
+  { file: "2026pingpongstatechampionships-077", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 077" },
+  { file: "2026pingpongstatechampionships-078", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 078" },
+  { file: "2026pingpongstatechampionships-081", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 081" },
+  { file: "2026pingpongstatechampionships-096", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 096" },
+  { file: "2026pingpongstatechampionships-097", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 097" },
+  { file: "2026pingpongstatechampionships-098", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 098" },
+  { file: "2026pingpongstatechampionships-099", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 099" },
+  { file: "2026pingpongstatechampionships-107", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 107" },
+  { file: "2026pingpongstatechampionships-108", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 108" },
+  { file: "2026pingpongstatechampionships-109", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 109" },
+  { file: "2026pingpongstatechampionships-111", tournament: "state-2026", featured: false,
+    caption: "State Championships at Hazen High School, photo 111" }
 ];
 
 
