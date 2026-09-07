@@ -3,7 +3,7 @@
    =========================================================================
 
    This file was written by the officer editor at admin.html
-   Last updated: 9/6/2026, 9:16:32 PM
+   Last updated: 9/6/2026, 9:33:33 PM
 
    You can edit it by hand, but the editor is safer because it cannot
    produce a typo that breaks the site.
@@ -222,7 +222,61 @@ const PHOTOS = [
   { file: null, tournament: "state-2026", featured: false,
     caption: "State photo coming soon" },
   { file: null, tournament: "state-2026", featured: false,
-    caption: "State photo coming soon" }
+    caption: "State photo coming soon" },
+  { file: "2026pingpongstatechampionships-014", tournament: "state-2026", featured: false,
+    caption: "Whole team together" },
+  { file: "2026pingpongstatechampionships-034", tournament: "state-2026", featured: false,
+    caption: "Sumarth pushing" },
+  { file: "2026pingpongstatechampionships-035", tournament: "state-2026", featured: false,
+    caption: "Sumarth doing the tomahawk serve" },
+  { file: "2026pingpongstatechampionships-036", tournament: "state-2026", featured: false,
+    caption: "Sumarth ready to receive" },
+  { file: "2026pingpongstatechampionships-037", tournament: "state-2026", featured: false,
+    caption: "Terrance doing the pendulum serve" },
+  { file: "2026pingpongstatechampionships-041", tournament: "state-2026", featured: false,
+    caption: "Terrance doing the backhand serve" },
+  { file: "2026pingpongstatechampionships-044", tournament: "state-2026", featured: false,
+    caption: "Terrance doing a backhand block" },
+  { file: "2026pingpongstatechampionships-045", tournament: "state-2026", featured: false,
+    caption: "Sumarth doing a chop" },
+  { file: "2026pingpongstatechampionships-046", tournament: "state-2026", featured: false,
+    caption: "Sumarth ready to receive" },
+  { file: "2026pingpongstatechampionships-047", tournament: "state-2026", featured: false,
+    caption: "Sumarth doing the hook serve" },
+  { file: "2026pingpongstatechampionships-048", tournament: "state-2026", featured: false,
+    caption: "Tobin doing a backhand loop" },
+  { file: "2026pingpongstatechampionships-049", tournament: "state-2026", featured: false,
+    caption: "Tobin ready to recieve" },
+  { file: "2026pingpongstatechampionships-050", tournament: "state-2026", featured: false,
+    caption: "Daniel ready to serve" },
+  { file: "2026pingpongstatechampionships-051", tournament: "state-2026", featured: false,
+    caption: "Daniel ready to loop" },
+  { file: "2026pingpongstatechampionships-052", tournament: "nationals-2026", featured: false,
+    caption: "Daniel doing a loop" },
+  { file: "2026pingpongstatechampionships-076", tournament: "state-2026", featured: false,
+    caption: "Joshua Y doing a backhand serve" },
+  { file: "2026pingpongstatechampionships-077", tournament: "state-2026", featured: false,
+    caption: "Joshua Y doing a backhand serve" },
+  { file: "2026pingpongstatechampionships-078", tournament: "state-2026", featured: false,
+    caption: "Joshua Y doing a backhand serve" },
+  { file: "2026pingpongstatechampionships-081", tournament: "state-2026", featured: false,
+    caption: "Team ready on the bench" },
+  { file: "2026pingpongstatechampionships-096", tournament: "state-2026", featured: false,
+    caption: "Daniel doing a pendulum serve" },
+  { file: "2026pingpongstatechampionships-097", tournament: "state-2026", featured: false,
+    caption: "Daniel doing a pendulum serve" },
+  { file: "2026pingpongstatechampionships-098", tournament: "state-2026", featured: false,
+    caption: "Adam doing a push" },
+  { file: "2026pingpongstatechampionships-099", tournament: "state-2026", featured: false,
+    caption: "Adam ready to loop" },
+  { file: "2026pingpongstatechampionships-107", tournament: "state-2026", featured: false,
+    caption: "Dan ready to push" },
+  { file: "2026pingpongstatechampionships-108", tournament: "state-2026", featured: false,
+    caption: "Dan doing a pendulum serve" },
+  { file: "2026pingpongstatechampionships-109", tournament: "state-2026", featured: false,
+    caption: "Dan doing a pendulum serve" },
+  { file: "2026pingpongstatechampionships-111", tournament: "state-2026", featured: false,
+    caption: "Dan doing a pendulum serve" }
 ];
 
 
