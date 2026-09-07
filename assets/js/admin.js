@@ -361,16 +361,19 @@
     if (!b) return;
 
     /* ---- shrunk photo buttons ---- */
+    if (b.id === "dlall-big")   { downloadAll("big");   return; }
+    if (b.id === "dlall-small") { downloadAll("small"); return; }
+
     if (b.dataset.dlfull !== undefined) {
       var sf = shrunk[b.dataset.dlfull];
       saveBlob(sf.full.blob, sf.slug + ".jpg");
-      b.classList.add("copied"); b.textContent = "1. Downloaded";
+      sf.gotBig = true; drawShrunk();
       return;
     }
     if (b.dataset.dlthumb !== undefined) {
       var st = shrunk[b.dataset.dlthumb];
       saveBlob(st.thumb.blob, st.slug + ".jpg");
-      b.classList.add("copied"); b.textContent = "2. Downloaded";
+      st.gotSmall = true; drawShrunk();
       return;
     }
     if (b.dataset.dropshot !== undefined) {
@@ -379,6 +382,7 @@
       return;
     }
     if (b.id === "addall-btn") {
+      if (b.disabled) return;
       var n = 0;
       shrunk.forEach(function (s) {
         if (s.added) return;
@@ -392,9 +396,9 @@
       });
       save(); drawAll(); drawShrunk();
       if (n) {
-        alert(n + " photo" + (n === 1 ? "" : "s") + " added to the list below.\n\n" +
-              "You still need to download both files for each one and upload them to " +
-              "GitHub, otherwise the pictures will not appear.");
+        alert(n + " photo" + (n === 1 ? "" : "s") + " added.\n\n" +
+              "Next: go to the Publish tab and follow steps A, B and C to upload " +
+              "the picture files and publish the text.");
       }
       return;
     }
@@ -908,20 +912,47 @@
     if (!shrunk.length) { out.innerHTML = ""; return; }
 
     var opts = tourneyOpts();
+    var gotBig = shrunk.filter(function (s) { return s.gotBig; }).length;
+    var gotSmall = shrunk.filter(function (s) { return s.gotSmall; }).length;
+    var n = shrunk.length;
+    var ready = (gotBig === n && gotSmall === n);
 
     out.innerHTML =
-      '<div class="warn green"><strong>Done. ' + shrunk.length + " photo" +
-      (shrunk.length === 1 ? " is" : "s are") + " ready.</strong> " +
-      "Now do three things for each one: pick its tournament, write a caption, " +
-      "then click both download buttons. After that jump to the " +
-      "<strong>Publish</strong> tab, where step A explains where the two files go." +
+      '<div class="warn green"><strong>' + n + " photo" +
+      (n === 1 ? " is" : "s are") + " shrunk and ready.</strong> " +
+      "Set the tournament and caption on each, then use the two big buttons below." +
       "</div>" +
+
+      '<div class="steps-box">' +
+        '<div class="step-line' + (gotBig === n ? " ok" : "") + '">' +
+          '<span class="step-n">1</span>' +
+          '<button class="btn btn-primary" id="dlall-big">Download all big versions</button>' +
+          '<span class="step-note">' + gotBig + " of " + n + " downloaded</span>" +
+        "</div>" +
+        '<div class="step-line' + (gotSmall === n ? " ok" : "") + '">' +
+          '<span class="step-n">2</span>' +
+          '<button class="btn btn-navy" id="dlall-small">Download all thumbnails</button>' +
+          '<span class="step-note">' + gotSmall + " of " + n + " downloaded</span>" +
+        "</div>" +
+        '<div class="step-line' + (ready ? "" : " locked") + '">' +
+          '<span class="step-n">3</span>' +
+          '<button class="btn ' + (ready ? "btn-primary" : "btn-locked") + '" id="addall-btn"' +
+            (ready ? "" : " disabled") + ">Add them to the website</button>" +
+          '<span class="step-note">' +
+            (ready ? "Ready" : "Do steps 1 and 2 first") + "</span>" +
+        "</div>" +
+      "</div>" +
+
+      (ready ? '<div class="warn"><strong>Your browser has saved ' + (n * 2) +
+        " files, two for each photo.</strong> They are in your Downloads folder. " +
+        "The <strong>Publish</strong> tab shows where each set goes.</div>" : "") +
+
       shrunk.map(function (s, i) {
         return '<div class="shot">' +
           '<img src="' + s.preview + '" alt="">' +
           "<div>" +
             '<div class="shot-name">' + esc(s.slug) + ".jpg" +
-              (s.added ? '<span class="done-badge">added to list</span>' : "") + "</div>" +
+              (s.added ? '<span class="done-badge">on the website</span>' : "") + "</div>" +
             '<div class="shot-meta">' + esc(s.origName) + " &middot; was <b>" + kb(s.origSize) +
               "</b>, now <b>" + kb(s.full.blob.size) + "</b> + " + kb(s.thumb.blob.size) +
               " thumbnail</div>" +
@@ -930,16 +961,32 @@
               field("Caption", "SHOT." + i + ".caption", s.caption, "shows under the photo") +
             "</div>" +
             '<div class="shot-dl">' +
-              '<button class="btn btn-primary" data-dlfull="' + i + '">1. Download big version</button>' +
-              '<button class="btn btn-navy" data-dlthumb="' + i + '">2. Download thumbnail</button>' +
+              '<button class="mini" data-dlfull="' + i + '">' +
+                (s.gotBig ? "Big version saved" : "Save big version") + "</button>" +
+              '<button class="mini" data-dlthumb="' + i + '">' +
+                (s.gotSmall ? "Thumbnail saved" : "Save thumbnail") + "</button>" +
               '<button class="mini danger" data-dropshot="' + i + '">Remove</button>' +
             "</div>" +
           "</div></div>";
       }).join("") +
-      '<div class="add-row" style="margin-top:16px">' +
-        '<button class="btn btn-primary" id="addall-btn">Add all of these to the photo list</button> ' +
-        '<button class="mini" id="clearshots-btn" style="margin-left:8px">Clear</button>' +
+      '<div class="add-row" style="margin-top:14px">' +
+        '<button class="mini" id="clearshots-btn">Clear all of these</button>' +
       "</div>";
+  }
+
+  /* Browsers block rapid-fire downloads, so space them out. */
+  async function downloadAll(which) {
+    var btn = $(which === "big" ? "dlall-big" : "dlall-small");
+    var orig = btn.textContent;
+    for (var i = 0; i < shrunk.length; i++) {
+      var s = shrunk[i];
+      btn.textContent = "Saving " + (i + 1) + " of " + shrunk.length + "...";
+      saveBlob(which === "big" ? s.full.blob : s.thumb.blob, s.slug + ".jpg");
+      if (which === "big") s.gotBig = true; else s.gotSmall = true;
+      await new Promise(function (r) { setTimeout(r, 350); });
+    }
+    btn.textContent = orig;
+    drawShrunk();
   }
 
   /* dropzone wiring */
